@@ -2,7 +2,6 @@ use crate::domain::auth_domain::{BaseResponse, Request, Token};
 use crate::service::service::AuthService;
 use crate::AppState;
 use axum::{
-    debug_handler,
     extract::{Json, State},
     http::StatusCode,
     response::{IntoResponse, Json as AxumJson},
@@ -38,14 +37,14 @@ pub async fn login_handler(
             .into_response(),
         Ok(None) => (
             StatusCode::UNAUTHORIZED,
-            AxumJson(BaseResponse::new(Token {
+            AxumJson(BaseResponse::err(Token {
                 access_token: "".to_string(),
             })),
         )
             .into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            AxumJson(BaseResponse::new(Token {
+            AxumJson(BaseResponse::err(Token {
                 access_token: "".to_string(),
             })),
         )

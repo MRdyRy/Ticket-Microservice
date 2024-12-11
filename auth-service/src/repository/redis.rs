@@ -42,10 +42,6 @@ impl CacheProvider for RedisRepository {
     async fn get(&self, key: &str) -> Result<String, RedisError> {
         let mut con = self.client.get_multiplexed_async_connection().await?;
         let result: RedisResult<String> = con.get(key).await;
-
-        match result {
-            Ok(val) => Ok(val),
-            Err(e) => Err(e),
-        }
+        Ok(result.unwrap())
     }
 }
