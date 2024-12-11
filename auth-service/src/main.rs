@@ -75,7 +75,7 @@ async fn main() {
         secret: "".to_string(),
     };
 
-    let redis = RedisRepository::new(&*config.redis_host, &*config.redis_password);
+    let redis = RedisRepository::new(&config.redis_host, &config.redis_password);
     let rest = RestRepository::new(UserRepository {
         url: config.user_service.clone(),
     });

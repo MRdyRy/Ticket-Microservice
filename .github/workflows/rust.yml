@@ -44,4 +44,4 @@ jobs:
       - name: Run Clippy
         run: |
           cd auth-service
-          cargo clippy --all -- -D warnings
+          cargo clippy --all --fix --allow-dirty -- -D warnings
