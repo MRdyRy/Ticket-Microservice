@@ -1,14 +1,13 @@
-use crate::handler::authhandler::login;
+use crate::handler::auth_handler::{login_handler};
 use crate::handler::healthcheck::healthcheck;
-use crate::repository::http::{Http, UserRepository};
-use crate::repository::redis::{RedisProvider, RedisRepository};
+use crate::repository::http::{RestRepository, UserRepository};
+use crate::repository::redis::{RedisRepository};
 use crate::service::service::Service;
-use axum::routing::{get, post};
-use axum::Router;
+use axum::routing::{get, post, Router};
 use std::sync::Arc;
 
 mod domain {
-    pub mod authdomain;
+    pub mod auth_domain;
     pub mod claims;
 }
 mod repository {
@@ -20,11 +19,11 @@ mod service {
     pub mod service;
 }
 mod handler {
-    pub mod authhandler;
+    pub mod auth_handler;
     pub mod healthcheck;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct AppState {
     pub config: AppConfig,
     pub service: Service,
@@ -37,6 +36,7 @@ pub struct AppConfig {
     pub redis_port: u16,
     pub redis_password: String,
     pub app_addr: String,
+    pub secret: String,
 }
 
 #[tokio::main]
@@ -47,23 +47,24 @@ async fn main() {
         redis_port: 6379,
         redis_password: "".to_string(),
         app_addr: "localhost:8080".to_string(),
+        secret: "".to_string(),
     };
 
     let redis = RedisRepository::new(&*config.redis_host, &*config.redis_password);
-    let rest = Http::new(UserRepository {
+    let rest = RestRepository::new(UserRepository {
         url: config.user_service.clone(),
     });
 
     let service = Service::new(Arc::new(redis), Arc::new(rest));
-    let server_state = AppState { config, service };
+    let app_state = AppState { config, service };
 
-    let app: Router = Router::new()
+    let app = Router::new()
         .route("/", get(healthcheck))
-        .route("/login", post(login))
-        .with_state(server_state);
+        .route("/auth", post(login_handler))
+        .with_state(app_state);
 
     let listen = tokio::net::TcpListener::bind(config.app_addr)
         .await
         .unwrap();
-    axum::serve(listen, app).await;
+    axum::serve(listen, app).await.expect("Failed to listen !!");
 }

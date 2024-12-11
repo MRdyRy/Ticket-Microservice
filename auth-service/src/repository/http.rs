@@ -1,11 +1,10 @@
-use crate::domain::authdomain::{Request, UserResponse};
+use crate::domain::auth_domain::{Request, UserResponse};
 use axum::async_trait;
-use dyn_clone::DynClone;
 use reqwest::{Client, ClientBuilder};
 use std::error::Error;
 
 #[derive(Debug, Clone)]
-pub struct Http {
+pub struct RestRepository {
     pub client: Client,
     pub url_user: String,
 }
@@ -21,38 +20,38 @@ pub struct UserRepository {
 }
 
 #[async_trait]
-pub trait HttpProvider: AuthProvider + Send + Sync + DynClone {}
+pub trait HttpProvider: AuthProvider + Send + Sync {}
 
-impl Http {
-    pub fn new(user: UserRepository) -> Http {
-        let s = ClientBuilder::new().build().unwrap();
-        Http {
-            client: s,
+impl RestRepository {
+    pub fn new(user: UserRepository) -> RestRepository {
+        let client = ClientBuilder::new()
+            .build()
+            .expect("Failed to create HTTP client");
+        RestRepository {
+            client,
             url_user: user.url,
         }
     }
 }
-
-impl AuthProvider for Http {
+impl HttpProvider for RestRepository {}
+#[async_trait]
+impl AuthProvider for RestRepository {
     async fn check_user(&self, req: Request) -> Result<bool, Box<dyn Error>> {
-        match self
+        // Send the POST request to check user
+        let response = self
             .client
-            .post(self.url_user.parse().unwrap())
+            .post(self.url_user.clone())
             .json(&req)
             .send()
-            .await
-        {
-            Ok(response) => {
-                if response.status().is_success() {
-                    match response.json::<UserResponse>().await {
-                        Ok(isValid) => Ok(isValid.into()),
-                        _ => Ok(false),
-                    }
-                } else {
-                    Ok(false)
-                }
-            }
-            Err(_) => Ok(false),
+            .await;
+
+        match response {
+            Ok(resp) if resp.status().is_success() => match resp.json::<UserResponse>().await {
+                Ok(user_response) => Ok(user_response.valid),
+                Err(err) => Err(Box::new(err) as Box<dyn Error>),
+            },
+            Ok(_) => Ok(false),
+            Err(err) => Err(Box::new(err) as Box<dyn Error>),
         }
     }
 }

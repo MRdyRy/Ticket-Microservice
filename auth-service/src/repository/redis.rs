@@ -1,7 +1,6 @@
-use crate::repository::http::AuthProvider;
 use axum::async_trait;
 use dyn_clone::DynClone;
-use redis::{Client, Commands, RedisError, RedisResult};
+use redis::{AsyncCommands, Client, RedisError, RedisResult};
 
 #[derive(Clone, Debug)]
 pub struct RedisRepository {
@@ -9,10 +8,11 @@ pub struct RedisRepository {
 }
 
 #[async_trait]
-pub trait CacheProvider {
+pub trait CacheProvider: Send + Sync {
     async fn set(&self, key: &str, value: &str) -> Result<bool, RedisError>;
-    fn get(&self, key: &str) -> Result<String, RedisError>;
+    async fn get(&self, key: &str) -> Result<String, RedisError>;
 }
+
 #[async_trait]
 pub trait RedisProvider: CacheProvider + Send + Sync + DynClone {}
 
@@ -20,24 +20,32 @@ impl<T: RedisProvider + Send + Sync + DynClone> RedisProvider for T {}
 
 impl RedisRepository {
     pub fn new(host: &str, password: &str) -> RedisRepository {
-        let redis_host = format!("{}://:{}@{}", "redis", host, password);
-        let client = redis::Client::open(redis_host).expect("Could not connect to Redis");
+        let redis_host = format!("redis://:{}@{}", password, host);
+        let client = redis::Client::open(redis_host)
+            .expect("Failed to connect to Redis");
         RedisRepository { client }
     }
 }
 
 #[async_trait]
 impl CacheProvider for RedisRepository {
-    async fn set(&mut self, key: &str, value: &str) -> Result<bool, RedisError> {
-        let result = self.client.set_ex(key, value, 3600).await?;
-        Ok(result)
+    async fn set(&self, key: &str, value: &str) -> Result<bool, RedisError> {
+        let mut con = self.client.get_multiplexed_async_connection().await?;
+        let result: RedisResult<()> = con.set_ex(key, value, 3600).await;
+
+        match result {
+            Ok(_) => Ok(true),
+            Err(e) => Err(e),
+        }
     }
 
-    fn get(&mut self, key: &str) -> Result<String, RedisError> {
-        let result = self.client.get(key)?;
+    async fn get(&self, key: &str) -> Result<String, RedisError> {
+        let mut con = self.client.get_multiplexed_async_connection().await?;
+        let result: RedisResult<String> = con.get(key).await;
+
         match result {
-            RedisResult::Ok(val) => Ok(val),
+            Ok(val) => Ok(val),
+            Err(e) => Err(e),
         }
     }
 }
-

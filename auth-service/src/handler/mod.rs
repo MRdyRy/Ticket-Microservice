@@ -1,2 +1,2 @@
 pub mod healthcheck;
-pub mod authhandler;
+pub mod auth_handler;
