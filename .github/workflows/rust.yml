@@ -37,11 +37,11 @@ jobs:
       # Run tests
       - name: Run tests
         run: |
-          cd tiket-mircoservice/auth_service
+          cd /auth_service
           cargo test --all --verbose
 
       # (Optional) Run clippy for linting
       - name: Run Clippy
         run: |
-          cd tiket-mircoservice/auth_service
+          cd /auth_service
           cargo clippy --all -- -D warnings
