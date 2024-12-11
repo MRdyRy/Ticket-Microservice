@@ -31,7 +31,7 @@ jobs:
       # Install dependencies and build the project
       - name: Install dependencies and build
         run: |
-          cd tiket-mircoservice/auth_service
+          cd /auth_service
           cargo build --release
 
       # Run tests
