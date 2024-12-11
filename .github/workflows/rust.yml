@@ -31,6 +31,8 @@ jobs:
       # Install dependencies and build the project
       - name: Install dependencies and build
         run: |
+          pwd
+          ls -ltr
           cd /auth-service
           cargo build --release
 
