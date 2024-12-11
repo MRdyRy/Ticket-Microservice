@@ -1,7 +1,6 @@
 use crate::domain::auth_domain::{Request, UserResponse};
 use axum::async_trait;
 use reqwest::{Client, ClientBuilder};
-use std::error::Error;
 
 #[derive(Debug, Clone)]
 pub struct RestRepository {
@@ -11,7 +10,7 @@ pub struct RestRepository {
 
 #[async_trait]
 pub trait AuthProvider {
-    async fn check_user(&self, req: Request) -> Result<bool, Box<dyn Error>>;
+    async fn check_user(&self, req: Request) -> Result<bool, anyhow::Error>;
 }
 
 #[derive(Debug, Clone)]
@@ -33,10 +32,13 @@ impl RestRepository {
         }
     }
 }
-impl HttpProvider for RestRepository {}
+
+impl HttpProvider for RestRepository {
+    
+}
 #[async_trait]
 impl AuthProvider for RestRepository {
-    async fn check_user(&self, req: Request) -> Result<bool, Box<dyn Error>> {
+    async fn check_user(&self, req: Request) -> Result<bool, anyhow::Error> {
         // Send the POST request to check user
         let response = self
             .client
@@ -48,10 +50,10 @@ impl AuthProvider for RestRepository {
         match response {
             Ok(resp) if resp.status().is_success() => match resp.json::<UserResponse>().await {
                 Ok(user_response) => Ok(user_response.valid),
-                Err(err) => Err(Box::new(err) as Box<dyn Error>),
+                Err(err) => anyhow::bail!("HTTP error: {}", err),
             },
             Ok(_) => Ok(false),
-            Err(err) => Err(Box::new(err) as Box<dyn Error>),
+            Err(err) => Err(anyhow::anyhow!(err).context("error validate user")),
         }
     }
 }

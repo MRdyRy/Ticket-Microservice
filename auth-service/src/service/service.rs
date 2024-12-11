@@ -1,4 +1,3 @@
-use std::error::Error;
 use crate::domain::auth_domain::Request;
 use crate::repository::http::HttpProvider;
 use crate::repository::redis::CacheProvider;
