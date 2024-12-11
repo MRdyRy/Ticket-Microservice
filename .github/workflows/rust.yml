@@ -31,19 +31,17 @@ jobs:
       # Install dependencies and build the project
       - name: Install dependencies and build
         run: |
-          pwd
-          ls -ltr
-          cd /auth-service
+          cd auth-service
           cargo build --release
 
       # Run tests
       - name: Run tests
         run: |
-          cd /auth-service
+          cd auth-service
           cargo test --all --verbose
 
       # (Optional) Run clippy for linting
       - name: Run Clippy
         run: |
-          cd /auth-service
+          cd auth-service
           cargo clippy --all -- -D warnings
