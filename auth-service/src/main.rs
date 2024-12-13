@@ -7,6 +7,7 @@ use axum::routing::{get, post, Router};
 use std::sync::Arc;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
+use crate::config::app_config::AppConfig;
 use crate::handler::auth_handler::__path_login_handler;
 use crate::domain::auth_domain::{Request,Token, BaseResponse};
 
@@ -27,21 +28,16 @@ mod handler {
     pub mod healthcheck;
 }
 
+mod config {
+    pub mod app_config;
+}
 #[derive(Clone)]
 pub struct AppState {
     pub config: AppConfig,
     pub service: Service,
 }
 
-#[derive(Clone, Debug)]
-pub struct AppConfig {
-    pub user_service: String,
-    pub redis_host: String,
-    pub redis_port: u16,
-    pub redis_password: String,
-    pub app_addr: String,
-    pub secret: String,
-}
+
 
 #[derive(OpenApi)]
 #[openapi(
@@ -66,14 +62,7 @@ struct ApiDoc;
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    let config = AppConfig {
-        user_service: "localhost:8089".to_string(),
-        redis_host: "127.0.0.1".to_string(),
-        redis_port: 6379,
-        redis_password: "".to_string(),
-        app_addr: "localhost:8080".to_string(),
-        secret: "".to_string(),
-    };
+    let config = AppConfig::load();
 
     let redis = RedisRepository::new(&config.redis_host, &config.redis_password);
     let rest = RestRepository::new(UserRepository {
