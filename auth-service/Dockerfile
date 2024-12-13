@@ -1,14 +1,11 @@
 # Use the official Rust image as a builder
-FROM rust:1.74 as builder
+FROM rust:1.75 as builder
 
 # Create and set the working directory
 WORKDIR /app
 
 # Copy the Cargo.toml and Cargo.lock to the container
 COPY Cargo.toml Cargo.lock ./
-
-# Build dependencies only
-RUN cargo build --release
 
 # Now copy the entire source code to the container
 COPY . .
@@ -23,13 +20,13 @@ FROM debian:buster-slim
 RUN apt-get update && apt-get install -y openssl
 
 # Copy the compiled executable from the builder stage
-COPY --from=builder /app/target/release/my_service /usr/local/bin/auth-service
+COPY --from=builder /app/target/release/auth-service /usr/local/bin/auth-service
 
 # Set environment variables
 ENV RUST_LOG=info
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 8080
 
 # Start the application
 CMD ["auth-service"]

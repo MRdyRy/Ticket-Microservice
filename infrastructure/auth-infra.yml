@@ -10,8 +10,9 @@ services:
       - labs
 
   auth-service:
-    build: .
-    container_name: "auth-service"
+    image: serfanrud/${RELEASE_AUTH_SERVICE}
+    container_name: auth-service
+    hostname: auth-service
     restart: always
     env_file:
       - .env
