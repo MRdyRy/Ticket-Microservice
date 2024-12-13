@@ -5,10 +5,11 @@ FROM rust:1.75 as builder
 WORKDIR /app
 
 # Copy the Cargo.toml and Cargo.lock to the container
-COPY Cargo.toml Cargo.lock ./
+#COPY auth-service/Cargo.toml ./
+#COPY auth-service/Cargo.lock ./
 
 # Now copy the entire source code to the container
-COPY . .
+COPY auth-service/. .
 
 # Build the final executable
 RUN cargo build --release
