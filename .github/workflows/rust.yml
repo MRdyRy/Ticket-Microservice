@@ -38,7 +38,7 @@ jobs:
       - name: Run tests
         run: |
           cd auth-service
-          cargo test --all --verbose
+          cargo test
 
       # (Optional) Run clippy for linting
       - name: Run Clippy
@@ -70,7 +70,7 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t serfanrud/auth-service:${{ github.sha }} .
+          docker build . --file auth-service/Dockerfile -t serfanrud/auth-service:${{ github.sha }}
 
       # Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
