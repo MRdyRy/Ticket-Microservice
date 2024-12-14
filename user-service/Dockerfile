@@ -1,5 +1,5 @@
 # Use a Golang image as the base image for building the application
-FROM golang:1.20-alpine as builder
+FROM golang:1.23-alpine as builder
 
 LABEL DEVELOPER="ryanserfanru@gmail.com"
 LABEL APPS-NAME="user-service"
