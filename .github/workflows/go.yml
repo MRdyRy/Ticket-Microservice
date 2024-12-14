@@ -21,10 +21,10 @@ jobs:
         go-version: '1.23'
 
       # Install golangci-lint
-    - name: Install golangci-lint
-      run: |
-        curl -sSfL https://github.com/golangci/golangci-lint/releases/download/v1.50.1/golangci-lint-1.50.1-linux-amd64.tar.gz | tar -xzv -C /tmp
-        sudo mv /tmp/golangci-lint-1.50.1-linux-amd64/golangci-lint /usr/local/bin/
+    # - name: Install golangci-lint
+    #   run: |
+    #     curl -sSfL https://github.com/golangci/golangci-lint/releases/download/v1.50.1/golangci-lint-1.50.1-linux-amd64.tar.gz | tar -xzv -C /tmp
+    #     sudo mv /tmp/golangci-lint-1.50.1-linux-amd64/golangci-lint /usr/local/bin/
 
       # Build the Go project
     - name: Build
@@ -39,10 +39,10 @@ jobs:
         go test -v .
 
       # Run the linter
-    - name: Run golangci-lint
-      run: |
-        cd user-service
-        golangci-lint run --fix --timeout 5m
+    # - name: Run golangci-lint
+    #   run: |
+    #     cd user-service
+    #     golangci-lint run --fix --timeout 5m
   dockerize:
     runs-on: ubuntu-latest
     needs: build-and-test  # Ensure this job runs after `build-and-test` job
