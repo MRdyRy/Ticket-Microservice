@@ -1,4 +1,4 @@
-name: Go
+name: Go pipeline
 
 on:
   push:
@@ -30,13 +30,13 @@ jobs:
     - name: Build
       run: |
         cd user-service
-        go build -v ./...
+        go build -v .
 
       # Run tests
     - name: Test
       run: |
         cd user-service
-        go test -v ./...
+        go test -v .
 
       # Run the linter
     - name: Run golangci-lint
