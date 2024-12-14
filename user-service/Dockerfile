@@ -8,11 +8,13 @@ LABEL APPS-NAME="user-service"
 WORKDIR /app
 
 # Copy go.mod and go.sum and download dependencies
-COPY go.mod go.sum ./
+COPY user-service/go.mod ./
+COPY user-service/go.sum ./
+
 RUN go mod download
 
 # Copy the entire project to the container
-COPY . .
+COPY user-service/. .
 
 # Build the Go application
 RUN go build -o user-service .
