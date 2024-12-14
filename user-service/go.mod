@@ -1,6 +1,6 @@
 module user-service
 
-go 1.22.5
+go 1.23
 
 require github.com/jackc/pgx v3.6.2+incompatible
 
