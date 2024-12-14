@@ -3,6 +3,7 @@ FROM golang:1.20-alpine as builder
 
 LABEL DEVELOPER="ryanserfanru@gmail.com"
 LABEL APPS-NAME="user-service"
+
 # Set the current working directory in the container
 WORKDIR /app
 
@@ -14,7 +15,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go application
-RUN go build -o ticket-service .
+RUN go build -o user-service .
 
 # Use a smaller base image to run the app
 FROM alpine:3.18
@@ -32,4 +33,4 @@ COPY --from=builder /app/user-service .
 EXPOSE 8080
 
 # Command to run the app
-CMD ["./ticket-service"]
+CMD ["./user-service"]
