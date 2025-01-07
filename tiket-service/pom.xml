@@ -18,7 +18,10 @@
 		<license/>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>Rudy Ryanto</name>
+			<email>ryanserfanru@gmail.com</email>
+		</developer>
 	</developers>
 	<scm>
 		<connection/>
@@ -59,7 +62,7 @@
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>1.18.26</version>
+				<version>1.18.32</version>
 				<scope>provided</scope>
 			</dependency>
 

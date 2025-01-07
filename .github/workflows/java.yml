@@ -1,0 +1,69 @@
+name: Java pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  # Job for cleaning, building, and testing the project
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Java 21 with Maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          java-package: jdk
+          check-latest: false
+
+      # Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Clean, build, and test with Maven
+      - name: Build and Test with Maven
+        run: |
+          cd tiket-service
+          mvn clean install -DskipTests=false  # Use `install` to build the project
+        
+  # Job for pushing the Docker image to Docker Hub (depends on build_docker)
+  push_docker:
+    runs-on: ubuntu-latest
+    needs: build_and_test  # Ensures this job runs after the build_and_test job
+    steps:
+      # Checkout the code from the repository (again for this job)
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2  # Correct version for Docker login action
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
+       # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build . --file tiket-service/Dockerfile -t serfanrud/tiket-service:${{ github.sha }}
+
+      # Push Docker image to Docker Hub
+      - name: Push Docker image
+        run: |
+          docker push serfanrud/tiket-service:${{ github.sha }}
+
