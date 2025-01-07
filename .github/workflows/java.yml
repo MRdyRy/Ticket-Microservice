@@ -40,29 +40,11 @@ jobs:
         run: |
           cd tiket-service
           mvn clean install -DskipTests=false  # Use `install` to build the project
-
-  # Job for building the Docker image (depends on build_and_test)
-  build_docker:
-    runs-on: ubuntu-latest
-    needs: build_and_test  # Ensures this job runs after the build_and_test job
-    steps:
-      # Checkout the code from the repository (again for this job)
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Set up Docker Buildx
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2  # Correct version for Docker buildx setup
-
-      # Build Docker image
-      - name: Build Docker image
-        run: |
-          docker build . --file tiket-service/Dockerfile -t serfanrud/tiket-service:${{ github.sha }}
-
+        
   # Job for pushing the Docker image to Docker Hub (depends on build_docker)
   push_docker:
     runs-on: ubuntu-latest
-    needs: build_docker  # Ensures this job runs after the build_docker job
+    needs: build_and_test  # Ensures this job runs after the build_and_test job
     steps:
       # Checkout the code from the repository (again for this job)
       - name: Checkout code
@@ -74,8 +56,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          
+       # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build . --file tiket-service/Dockerfile -t serfanrud/tiket-service:${{ github.sha }}
 
       # Push Docker image to Docker Hub
       - name: Push Docker image
-        run: docker push serfanrud/tiket-service:${{ github.sha }}
+        run: |
+          docker push serfanrud/tiket-service:${{ github.sha }}
 
