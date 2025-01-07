@@ -77,4 +77,5 @@ jobs:
 
       # Push Docker image to Docker Hub
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/tiket-service:${{ github.sha }}
+        run: docker push serfanrud/tiket-service:${{ github.sha }}
+
