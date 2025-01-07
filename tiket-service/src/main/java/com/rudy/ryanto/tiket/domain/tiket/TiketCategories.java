@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Builder
 @Table(name = "TIKET_CATEGORIES")
 public class TiketCategories extends AuditTrail {

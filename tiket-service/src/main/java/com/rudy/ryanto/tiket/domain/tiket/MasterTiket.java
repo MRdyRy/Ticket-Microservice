@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "MASTER_TIKET")
 public class MasterTiket extends AuditTrail {
     @Id
