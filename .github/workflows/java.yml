@@ -34,7 +34,7 @@ jobs:
 
       # Clean, build, and test with Maven
       - name: Build and Test with Maven
-         run: |
+        run: | 
           cd tiket-service
           mvn clean -DskipTests=false
 
