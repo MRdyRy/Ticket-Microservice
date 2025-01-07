@@ -1,4 +1,4 @@
-FROM maven:3.8.6-openjdk-21 as BUILD-APPS
+FROM FROM maven:3.9.9-eclipse-temurin-21-alpine as BUILD-APPS
 
 LABEL DEVELOPER="ryanserfanru@gmail.com"
 LABEL APPS-NAME="tiket-service"
