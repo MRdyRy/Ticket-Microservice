@@ -5,6 +5,7 @@ LABEL APPS-NAME="tiket-service"
 WORKDIR /build-apps
 
 COPY . /build-apps
+RUN ls -ltr
 
 RUN mvn verify -DskipTests
 RUN mvn clean install -DskipTests
@@ -15,6 +16,5 @@ USER root
 LABEL DEVELOPER="ryanserfanru@gmail.com"
 LABEL APPS-NAME="tiket-service"
 WORKDIR /apps
-COPY --from=BUILD-APPS /build-apps/target/*.jar apps/apps.jar
 RUN ls -ltr
 ENTRYPOINT ["java","-jar","apps.jar"]
