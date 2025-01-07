@@ -1,4 +1,4 @@
-FROM FROM maven:3.9.9-eclipse-temurin-21-alpine as BUILD-APPS
+FROM maven:3.9.9-eclipse-temurin-21-alpine as BUILD-APPS
 
 LABEL DEVELOPER="ryanserfanru@gmail.com"
 LABEL APPS-NAME="tiket-service"
